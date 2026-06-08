@@ -60,7 +60,7 @@
                 </thead>
 
                 <tbody class="tbody" id="tbody">
-                    <tr>
+                    <tr id="row-1">
                         <td>1</td>
                         <td>UV Shield Aqua Fresh Sunscreen SPF 50</td>
                         <td>Wardah</td>
@@ -73,27 +73,27 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Update</a></li>
-                                    <li><a class="dropdown-item" href="#" style="color: red;">Delete</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="bukaUpdate('row-1'); return false;">Update</a></li>
+                                    <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('row-1'); return false;">Delete</a></li>
                                 </ul>
                             </div>
                         </td>
                     </tr>
-                    <tr>
+                    <tr id="row-2">
                         <td>2</td>
-                        <td>Glow Deep Serum</td>
-                        <td>Beauty of Joseon</td>
-                        <td>Serum</td>
-                        <td>13</td>
-                        <td>Rp165.000</td>
+                        <td>UV Shield Aqua Fresh Sunscreen SPF 50</td>
+                        <td>Wardah</td>
+                        <td>Sunscreen</td>
+                        <td>12</td>
+                        <td>Rp32.000</td>
                         <td>
                             <div class="dropdown">
                                 <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white;">
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Update</a></li>
-                                    <li><a class="dropdown-item" href="#" style="color: red;">Delete</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="bukaUpdate('row-1'); return false;">Update</a></li>
+                                    <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('row-2'); return false;">Delete</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -104,7 +104,6 @@
 
         <!--Modal-->
         <div class="overlay" id="overlay">
-            <form action="">
                 <div class="modal-box">
                     <p class="modal-box-title">Tambah Stok</p> <!--Judul form-->
 
@@ -145,24 +144,46 @@
 
                     <div class="modal-box-action">
                         <button class="btn-batal" type="button" onclick="tutupModal()">Batal</button>
-                        <button class="btn-simpan" type="button" onclick="simpan()">Simpan</button>
+                        <button class="btn-simpan" type="button" id="btn-simpan" onclick="simpan()">Simpan</button>
                     </div>
                 </div>
-            </form>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script>
+        let editRowId = null;
+        let rowCounter = 2;
+
         function bukaModal(){
+            editRowId = null;
+            document.querySelector('.modal-box-title').textContent = 'Tambah Stok';
+            document.getElementById('btn-simpan').textContent = 'Simpan';
+            ['f-nama', 'f-brand', 'f-stok', 'f-harga'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('f-kategori').value = '';
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function bukaUpdate(rowId){
+            const row = document.getElementById(rowId);
+            const cells = row.querySelectorAll('td');
+
+            editRowId = rowId;
+            document.querySelector('.modal-box-title').textContent = 'Update Stok';
+            document.getElementById('btn-simpan').textContent = 'Update';
+
+            document.getElementById('f-nama').value = cells[1].textContent;
+            document.getElementById('f-brand').value = cells[2].textContent;
+            document.getElementById('f-kategori').value = cells[3].textContent;
+            document.getElementById('f-stok').value = cells[4].textContent;
+            document.getElementById('f-harga').value = cells[5].textContent.replace('Rp', '').replace(/\./g, '');
             document.getElementById('overlay').classList.add('show');
         }
 
         function tutupModal(){
             document.getElementById('overlay').classList.remove('show');
-            ['f-nama', 'f-brand', 'f-stok', 'f-harga'].forEach(id => {
-            document.getElementById(id).value = '';
-            });
-            document.getElementById('f-kategori').value = '';
+            editRowId = null;
         }
 
         function simpan(){
@@ -177,33 +198,58 @@
                 return;
             }
 
-            const tbody = document.getElementById('tbody');
-            const nobaris = tbody.querySelectorAll('tr').length + 1;
             const hargarp = 'Rp' + Number(harga).toLocaleString('id-ID');
 
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${nobaris}</td>
-                <td>${nama}</td>
-                <td>${brand}</td>
-                <td>${kategori}</td>
-                <td>${stok}</td>
-                <td>${hargarp}</td>
-                <td>
-                    <div class="dropdown">
-                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white;">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
+            if(editRowId !== null){
+                const row = document.getElementById(editRowId);
+                const cells = row.querySelectorAll('td');
+                cells[1].textContent = nama;
+                cells[2].textContent = brand;
+                cells[3].textContent = kategori;
+                cells[4].textContent = stok;
+                cells[5].textContent = hargarp;
+            } else {
+                rowCounter++;
+                const newId = 'row-' + rowCounter;
+                const tbody = document.getElementById('tbody');
+                const nobaris = tbody.querySelectorAll('tr').length + 1;
 
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Update</a></li>
-                            <li><a class="dropdown-item" href="#" style="color: red;">Delete</a></li>
-                        </ul>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
+                const tr = document.createElement('tr');
+                tr.id = newId;
+                tr.innerHTML = `
+                    <td>${nobaris}</td>
+                    <td>${nama}</td>
+                    <td>${brand}</td>
+                    <td>${kategori}</td>
+                    <td>${stok}</td>
+                    <td>${hargarp}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white;">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="bukaUpdate('${newId}'); return false">Update</a></li>
+                                <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('${newId}'); return false">Delete</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
             tutupModal();
+        }
+
+        function hapus(rowId){
+            if(confirm('Yakin ingin dihapus?')){
+                document.getElementById(rowId).remove();
+                
+                const rows = document.getElementById('tbody').querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    row.querySelectorAll('td')[0].textContent = index + 1;
+                });
+            }
         }
     </script>
   </body>
