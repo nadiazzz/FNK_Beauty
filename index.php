@@ -1,3 +1,20 @@
+<?php
+
+include 'php/koneksi.php';
+
+if (isset($_GET['keyword']) && $_GET['keyword'] != '') {
+    $keyword = $_GET['keyword'];
+    
+    $query = "SELECT * FROM produk WHERE 
+              nama_produk LIKE '%$keyword%' OR 
+              brand LIKE '%$keyword%'";
+} else {
+    $query = "SELECT * FROM produk";
+}
+
+$data = mysqli_query($koneksi, $query);
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -35,9 +52,10 @@
                 <!--Tab pencari-->
                 <div class="search-tab">
                     <div class="container-fluid">
-                        <form class="d-flex" role="search" style="gap: 10px;">
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search"/>
+                        <form class="d-flex" role="search" style="gap: 10px;" action="index.php" method="GET">
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="keyword"/>
                             <button class="btn" type="submit" style="border-color: #604d53; color: #604d53;">Cari</button>
+                            <a href="index.php" class="btn" style="border-color: #604d53; color: #604d53; text-decoration: none; padding: 6px 12px; border: 1px solid #000000; border-radius: 4px;">Reset</a>
                         </form>
                     </div>
                 </div>
@@ -60,43 +78,43 @@
                 </thead>
 
                 <tbody class="tbody" id="tbody">
-                    <tr id="row-1">
-                        <td>1</td>
-                        <td>UV Shield Aqua Fresh Sunscreen SPF 50</td>
-                        <td>Wardah</td>
-                        <td>Sunscreen</td>
-                        <td>12</td>
-                        <td>Rp32.000</td>
-                        <td>
-                            <div class="dropdown">
+                        <?php
+                        $no = 1;
+
+                        while($row = mysqli_fetch_assoc($data)){    
+                        ?>
+
+                        <tr id="row-<?= $row['id']; ?>">
+
+                            <td><?= $no++ ?></td>
+                            <td><?= $row['nama_produk']; ?></td>
+                            <td><?= $row['brand']; ?></td>
+                            <td><?= $row['kategori']; ?></td>
+                            <td><?= $row['stok']; ?></td>
+                            <td><?= $row['harga']; ?></td>
+
+                            <td>
+                                <div class="dropdown">
                                 <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white;">
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="bukaUpdate('row-1'); return false;">Update</a></li>
-                                    <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('row-1'); return false;">Delete</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="bukaUpdate(
+                                            '<?= $row['id']; ?>', 
+                                            '<?= $row['nama_produk']; ?>', 
+                                            '<?= $row['brand']; ?>', 
+                                            '<?= $row['kategori']; ?>', 
+                                            '<?= $row['stok']; ?>', 
+                                            '<?= $row['harga']; ?>'
+                                        ); return false;">Update</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('row-<?= $row['id']; ?>');">Delete</a></li>
                                 </ul>
                             </div>
-                        </td>
-                    </tr>
-                    <tr id="row-2">
-                        <td>2</td>
-                        <td>UV Shield Aqua Fresh Sunscreen SPF 50</td>
-                        <td>Wardah</td>
-                        <td>Sunscreen</td>
-                        <td>12</td>
-                        <td>Rp32.000</td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white;">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="bukaUpdate('row-1'); return false;">Update</a></li>
-                                    <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('row-2'); return false;">Delete</a></li>
-                                </ul>
-                            </div>
-                        </td>
+                            </td>
+                        </tr>
+                        <?php } ?>
                     </tr>
                 </tbody>
             </table>
@@ -105,19 +123,21 @@
         <!--Modal-->
         <div class="overlay" id="overlay">
                 <div class="modal-box">
+                    <form action="php/proses.php" method="POST">
+
                     <p class="modal-box-title">Tambah Stok</p> <!--Judul form-->
 
                     <div class="modal-box-data">
                         <label>Nama Produk</label>
-                        <input type="text" id="f-nama" placeholder="Contoh: Glow Serum Vit C">
+                        <input type="text" id="f-nama" name="nama_produk" placeholder="Contoh: Glow Serum Vit C">
                     </div>
                     <div class="modal-box-data">
                         <label>Brand</label>
-                        <input type="text" id="f-brand" placeholder="Contoh: Wardah">
+                        <input type="text" id="f-brand" name="brand" placeholder="Contoh: Wardah">
                     </div>
                     <div class="modal-box-data">
                         <label>Kategori</label>
-                        <select name="" id="f-kategori">
+                        <select id="f-kategori" name="kategori">
                             <option value="">— Pilih kategori —</option>
                             <option>Sunscreen</option>
                             <option>Serum</option>
@@ -134,20 +154,73 @@
                     <div class="modal-box-row"> 
                         <div class="modal-box-data">
                              <label>Jumlah Stok</label>
-                             <input type="number" id="f-stok" placeholder="0" min="0">
+                             <input type="number" id="f-stok" name="stok" placeholder="0" min="0">
                         </div>
                         <div class="modal-box-data">
                              <label>Harga (Rp)</label>
-                             <input type="number" id="f-harga" placeholder="0" min="0">
+                             <input type="number" id="f-harga" name="harga" placeholder="0" min="0">
                         </div>
                     </div>
 
                     <div class="modal-box-action">
                         <button class="btn-batal" type="button" onclick="tutupModal()">Batal</button>
-                        <button class="btn-simpan" type="button" id="btn-simpan" onclick="simpan()">Simpan</button>
+                        <button class="btn-simpan" type="submit" id="btn-simpan" onclick="simpan()">Simpan</button>
                     </div>
                 </div>
+                </form>
         </div>
+
+        <div class="overlay" id="overlay-update" style="display: none;"> 
+            <div class="modal-box">
+                <form action="php/proses_update.php" method="POST">
+            
+                    <input type="hidden" id="u-id" name="id">
+
+                    <p class="modal-box-title">Update Stok</p>
+
+                    <div class="modal-box-data">
+                        <label>Nama Produk</label>
+                        <input type="text" id="u-nama" name="nama_produk">
+                    </div>
+                
+                    <div class="modal-box-data">
+                        <label>Brand</label>
+                        <input type="text" id="u-brand" name="brand">
+                    </div>
+
+                    <div class="modal-box-data">
+                        <label>Kategori</label>
+                        <select id="u-kategori" name="kategori">
+                        <option value="Sunscreen">Sunscreen</option>
+                        <option value="Serum">Serum</option>
+                        <option value="Moisturizer">Moisturize</option>
+                        <option value="Toner">Toner</option>
+                        <option value="Cleanser">Cleanser</option>
+                        <option value="Mask">Mask</option>
+                        <option value="Eye Cream">Eye Cream</option>
+                        <option value="Lip Care">Lip Care</option>
+                        <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-box-data">
+                        <label>Jumlah Stok</label>
+                        <input type="number" id="u-stok" name="stok">
+                    </div>
+
+                    <div class="modal-box-data">
+                        <label>Harga (Rp)</label>
+                        <input type="number" id="u-harga" name="harga">
+                    </div>
+
+                    <div class="model-box-action">
+                        <button class="btn-batal" type="button" onclick="tutupUpdate()">Batal</button>
+                        <button class="btn-simpan" type="submit" id="btn-simpan" name="update" onclick="simpan()">Update Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script>
@@ -243,13 +316,25 @@
 
         function hapus(rowId){
             if(confirm('Yakin ingin dihapus?')){
-                document.getElementById(rowId).remove();
+                const idAsli = rowId.replace('row-', '');
                 
-                const rows = document.getElementById('tbody').querySelectorAll('tr');
-                rows.forEach((row, index) => {
-                    row.querySelectorAll('td')[0].textContent = index + 1;
-                });
+                window.location.href = "php/proses_delete.php?id=" + idAsli;
             }
+        }
+
+        function bukaUpdate(id, nama, brand, kategori, stok, harga) {
+            document.getElementById('u-id').value = id;
+            document.getElementById('u-nama').value = nama;
+            document.getElementById('u-brand').value = brand;
+            document.getElementById('u-kategori').value = kategori;
+            document.getElementById('u-stok').value = stok;
+            document.getElementById('u-harga').value = harga;
+
+            document.getElementById('overlay-update').style.display = 'flex';
+        }
+
+        function tutupUpdate() {
+            document.getElementById('overlay-update').style.display = 'none';
         }
     </script>
   </body>
