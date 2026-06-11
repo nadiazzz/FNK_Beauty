@@ -7,7 +7,8 @@ if (isset($_GET['keyword']) && $_GET['keyword'] != '') {
     
     $query = "SELECT * FROM produk WHERE 
               nama_produk LIKE '%$keyword%' OR 
-              brand LIKE '%$keyword%'";
+              brand LIKE '%$keyword%' OR 
+              kategori LIKE '%$keyword%'";
 } else {
     $query = "SELECT * FROM produk";
 }
