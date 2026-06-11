@@ -91,7 +91,7 @@ $data = mysqli_query($koneksi, $query);
                             <td><?= $row['brand']; ?></td>
                             <td><?= $row['kategori']; ?></td>
                             <td><?= $row['stok']; ?></td>
-                            <td><?= $row['harga']; ?></td>
+                            <td><?php echo "Rp " . number_format($row['harga'], 0, ',', '.'); ?></td>
 
                             <td>
                                 <div class="dropdown">
@@ -123,7 +123,7 @@ $data = mysqli_query($koneksi, $query);
         <!--Modal-->
         <div class="overlay" id="overlay">
                 <div class="modal-box">
-                    <form action="php/proses.php" method="POST">
+                    <form action="PHP/proses.php" method="POST">
 
                     <p class="modal-box-title">Tambah Stok</p> <!--Judul form-->
 

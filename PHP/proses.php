@@ -22,6 +22,6 @@ mysqli_query(
      '$harga')"
 );
 
-header("Location: index.php");
+header("Location: ../index.php");
 
 ?>
