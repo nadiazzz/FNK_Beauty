@@ -1,7 +1,7 @@
 <?php
 include 'koneksi.php';
 
-if (isset($_POST['update'])) {
+if (isset($_POST['update'])) { //Untuk mengecek apakah variabel sudah memiliki nilai atau belum
 
     $id     = $_POST['id'];
     $nama   = $_POST['nama_produk'];
