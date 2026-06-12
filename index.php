@@ -216,7 +216,7 @@ $data = mysqli_query($koneksi, $query);
 
                     <div class="model-box-action">
                         <button class="btn-batal" type="button" onclick="tutupUpdate()">Batal</button>
-                        <button class="btn-simpan" type="submit" id="btn-simpan" name="update" onclick="simpan()">Update Data</button>
+                        <button class="btn-simpan" type="submit" id="btn-simpan" name="update">Update Data</button>
                     </div>
                 </form>
             </div>
@@ -225,94 +225,13 @@ $data = mysqli_query($koneksi, $query);
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script>
-        let editRowId = null;
-        let rowCounter = 2;
-
         function bukaModal(){
-            editRowId = null;
-            document.querySelector('.modal-box-title').textContent = 'Tambah Stok';
-            document.getElementById('btn-simpan').textContent = 'Simpan';
-            ['f-nama', 'f-brand', 'f-stok', 'f-harga'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            document.getElementById('f-kategori').value = '';
-            document.getElementById('overlay').classList.add('show');
-        }
-
-        function bukaUpdate(rowId){
-            const row = document.getElementById(rowId);
-            const cells = row.querySelectorAll('td');
-
-            editRowId = rowId;
-            document.querySelector('.modal-box-title').textContent = 'Update Stok';
-            document.getElementById('btn-simpan').textContent = 'Update';
-
-            document.getElementById('f-nama').value = cells[1].textContent;
-            document.getElementById('f-brand').value = cells[2].textContent;
-            document.getElementById('f-kategori').value = cells[3].textContent;
-            document.getElementById('f-stok').value = cells[4].textContent;
-            document.getElementById('f-harga').value = cells[5].textContent.replace('Rp', '').replace(/\./g, '');
             document.getElementById('overlay').classList.add('show');
         }
 
         function tutupModal(){
             document.getElementById('overlay').classList.remove('show');
             editRowId = null;
-        }
-
-        function simpan(){
-            const nama = document.getElementById('f-nama').value.trim();
-            const brand = document.getElementById('f-brand').value.trim();
-            const kategori = document.getElementById('f-kategori').value;
-            const stok = document.getElementById('f-stok').value;
-            const harga = document.getElementById('f-harga').value;
-
-            if (!nama || !brand || !kategori || !stok || !harga){
-                alert('Semua field wajib diisi!');
-                return;
-            }
-
-            const hargarp = 'Rp' + Number(harga).toLocaleString('id-ID');
-
-            if(editRowId !== null){
-                const row = document.getElementById(editRowId);
-                const cells = row.querySelectorAll('td');
-                cells[1].textContent = nama;
-                cells[2].textContent = brand;
-                cells[3].textContent = kategori;
-                cells[4].textContent = stok;
-                cells[5].textContent = hargarp;
-            } else {
-                rowCounter++;
-                const newId = 'row-' + rowCounter;
-                const tbody = document.getElementById('tbody');
-                const nobaris = tbody.querySelectorAll('tr').length + 1;
-
-                const tr = document.createElement('tr');
-                tr.id = newId;
-                tr.innerHTML = `
-                    <td>${nobaris}</td>
-                    <td>${nama}</td>
-                    <td>${brand}</td>
-                    <td>${kategori}</td>
-                    <td>${stok}</td>
-                    <td>${hargarp}</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white;">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="bukaUpdate('${newId}'); return false">Update</a></li>
-                                <li><a class="dropdown-item" href="#" style="color: red;" onclick="hapus('${newId}'); return false">Delete</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            }
-            tutupModal();
         }
 
         function hapus(rowId){
